@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<head>
+    <title>Colors Codes</title>
+    <style>
+        .line {
+          height: 20px;
+          width: 50%;
+          margin-right: 10px;
+          transition: height 0.2s, width 0.2s;
+          background-color: rgb(0,0,0);
+        }
+
+        .line-container {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+        cursor: pointer;
+        }
+        
+        .label {
+        font-family: sans-serif;
+        display: none; /* hidden by default */
+        }
+
+        .button {
+        margin: 5px;
+        }
+
+        .container {
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+<html>
+    <body>
+        <input type="range" id="heightSlider" min="1" max="100" value="20">
+        
+        <button id="regenerateBtn">Regenerate Color Lines</button>
+
+        <a href="ColorPaletteHandmade.html" target="_blank">
+            <button>Open Color Palette</button>
+        </a>
+
+        <div id="container"></div>
+        
+        <script>
+            const cssColors = [
+                "aliceblue","antiquewhite","aqua","aquamarine","azure",
+                "beige","bisque","black","blanchedalmond","blue",
+                "blueviolet","brown","burlywood","cadetblue","chartreuse",
+                "chocolate","coral","cornflowerblue","cornsilk","crimson",
+                "cyan","darkblue","darkcyan","darkgoldenrod","darkgray",
+                "darkgreen","darkkhaki","darkmagenta","darkolivegreen","darkorange",
+                "darkorchid","darkred","darksalmon","darkseagreen","darkslateblue",
+                "darkslategray","darkturquoise","darkviolet","deeppink","deepskyblue",
+                "dimgray","dodgerblue","firebrick","floralwhite","forestgreen",
+                "fuchsia","gainsboro","ghostwhite","gold","goldenrod",
+                "gray","green","greenyellow","honeydew","hotpink",
+                "indianred","indigo","ivory","khaki","lavender",
+                "lavenderblush","lawngreen","lemonchiffon","lightblue","lightcoral",
+                "lightcyan","lightgoldenrodyellow","lightgray","lightgreen","lightpink",
+                "lightsalmon","lightseagreen","lightskyblue","lightslategray","lightsteelblue",
+                "lightyellow","lime","limegreen","linen","magenta",
+                "maroon","mediumaquamarine","mediumblue","mediumorchid","mediumpurple",
+                "mediumseagreen","mediumslateblue","mediumspringgreen","mediumturquoise","mediumvioletred",
+                "midnightblue","mintcream","mistyrose","moccasin","navajowhite",
+                "navy","oldlace","olive","olivedrab","orange",
+                "orangered","orchid","palegoldenrod","palegreen","paleturquoise",
+                "palevioletred","papayawhip","peachpuff","peru","pink",
+                "plum","powderblue","purple","rebeccapurple","red",
+                "rosybrown","royalblue","saddlebrown","salmon","sandybrown",
+                "seagreen","seashell","sienna","silver","skyblue",
+                "slateblue","slategray","snow","springgreen","steelblue",
+                "tan","teal","thistle","tomato","turquoise",
+                "violet","wheat","white","whitesmoke","yellow","yellowgreen"
+            ];
+
+            function getRandomCssColor() {
+                return cssColors[Math.floor(Math.random() * cssColors.length)];
+            }
+
+            function colorNameToRGB(colorName) {
+                const temp = document.createElement("div");
+                temp.style.color = colorName;
+
+                document.body.appendChild(temp);
+
+                const rgb = getComputedStyle(temp).color;
+
+                document.body.removeChild(temp);
+
+                return rgb;
+            }
+            
+            // create lines
+            function generateColorLines(){
+                const container = document.getElementById("container");
+                container.className = "container";
+
+                // clear old content first (important)
+                container.innerHTML = "";
+
+                for(let i = 0; i < 10; i++) {
+                const color = getRandomCssColor();
+                const rgbCode = colorNameToRGB(color);
+
+                const wrapper = document.createElement("wrapper");
+                wrapper.className = "line-container";
+                
+                const div = document.createElement("div");
+                div.className = "line";
+                div.style.backgroundColor = color;
+
+                const label = document.createElement("span");
+                label.className = "label";
+                label.textContent =  `${color} --> ${rgbCode}`;
+                label.style.display = "none";
+                
+                wrapper.onclick = () => {
+                    label.style.display =
+                        label.style.display === "none" ? "inline" : "none";
+                };
+
+                wrapper.appendChild(div);
+                wrapper.appendChild(label);
+                container.appendChild(wrapper);
+                };
+            }
+            
+            generateColorLines();
+
+            const slider = document.getElementById("heightSlider");
+            
+            slider.oninput = () => {
+              const allLines = document.querySelectorAll(".line");
+              allLines.forEach(div => {
+                div.style.height = slider.value + "px";
+              });
+            };
+
+            document.getElementById("regenerateBtn").onclick = () => {
+                generateColorLines(); // rerun
+            };
+        </script>
+
+        <div>
+            <label>Red</label>
+            <input type="range" id="red" min="0" max="255" value="0">
+        
+            <label>Green</label>
+            <input type="range" id="green" min="0" max="255" value="0">
+        
+            <label>Blue</label>
+            <input type="range" id="blue" min="0" max="255" value="0">
+        </div>
+        
+        <div id="referenceColorLine"></div>
+        
+        <p id="output"></p>
+
+        <div id="buttons"></div>
+
+        <script>
+            const red = document.getElementById("red");
+            const green = document.getElementById("green");
+            const blue = document.getElementById("blue");
+
+            const referenceColorLine = document.getElementById("referenceColorLine");
+            referenceColorLine.className = "line";
+            const output = document.getElementById("output");
+
+            function updateColor() {
+                const r = red.value;
+                const g = green.value;
+                const b = blue.value;
+
+                const rgb = `rgb(${r}, ${g}, ${b})`;
+
+                referenceColorLine.style.backgroundColor = rgb;
+                output.textContent = rgb;
+            }
+
+            // update when sliders move
+            red.addEventListener("input", updateColor);
+            green.addEventListener("input", updateColor);
+            blue.addEventListener("input", updateColor);
+
+            // initial render
+            updateColor();
+
+            // buttons for preset basic colors to set the reference color line
+            const buttonsContainer = document.getElementById("buttons");
+            const basicColors = [
+                    { name: "red", rgb: [255, 0, 0] },
+                    { name: "green", rgb: [0, 128, 0] },
+                    { name: "blue", rgb: [0, 0, 255] },
+                    { name: "yellow", rgb: [255, 255, 0] },
+                    { name: "orange", rgb: [255, 165, 0] },
+                    { name: "purple", rgb: [128, 0, 128] },
+                    { name: "pink", rgb: [255, 192, 203] },
+                    { name: "brown", rgb: [165, 42, 42]},
+                    { name: "black", rgb: [0, 0, 0] },
+                    { name: "white", rgb: [255, 255, 255] },
+                    { name: "gray", rgb: [128, 128, 128] }
+                    ];
+
+            // create buttons
+            basicColors.forEach(color => {
+            const btn = document.createElement("button");
+            btn.textContent = color.name;
+            btn.style.color = color.name;
+
+            btn.onclick = () => {
+                red.value = color.rgb[0];
+                green.value = color.rgb[1];
+                blue.value = color.rgb[2];
+                updateColor();
+            };
+
+            buttonsContainer.appendChild(btn);
+            });
+        </script>
+
+    </body>
+</html>
